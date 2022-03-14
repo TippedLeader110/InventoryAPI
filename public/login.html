@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,minimum-scale=1">
+	<title>Login</title>
+	<!-- the form awesome library is used to add icons to our form -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+	<!-- include the stylesheet file -->
+	<link href="/stylesheets/style.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+	<div class="login">
+		<h1>Login</h1>
+		<form>
+			<label for="username">
+				<!-- font awesome icon -->
+				<i class="fas fa-user"></i>
+			</label>
+			<input type="text" name="username" placeholder="Username" id="username" required>
+			<label for="password">
+				<i class="fas fa-lock"></i>
+			</label>
+			<input type="password" name="password" placeholder="Password" id="password" required>
+			<input id="loginbtn" type="submit" value="Login">
+		</form>
+	</div>
+</body>
+<script>
+	var url = window.location.href
+	var arr = url.split("/");
+
+	var btn = document.querySelector("#loginbtn");
+	var username = document.querySelector("#username");
+	var password = document.querySelector("#password");
+
+
+	btn.addEventListener("click", (ev) => {
+		ev.preventDefault();
+		// alert('login');
+		username.setAttribute("disabled", "disabled");
+		// username.style.opacity = "0.5";
+		password.setAttribute("disabled", "disabled");
+		// password.style.opacity = "0.5";
+		btn.setAttribute("disabled", "disabled");
+		// btn.style.opacity = "0.5";
+		document.querySelector(".login").style.opacity = "0.5";
+		// alert(arr[1]);
+		var details = {
+			"username": username.value,
+			"password": password.value
+		}
+
+		var formData = [];
+		for (var property in details) {
+			var encodedKey = encodeURIComponent(property);
+			var encodedValue = encodeURIComponent(details[property]);
+			formData.push(encodedKey + "=" + encodedValue);
+		}
+		formData = formData.join("&");
+
+		fetch(arr[1] + "/login_users", {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+			},
+			body: formData
+		}).then(resp => resp.json()).then(result => {
+			console.log("result", result)
+			document.querySelector(".login").style.opacity = "1";
+			var color = "red solid"
+			if (result.status == 2) {
+				color = "green solid"
+				sessionStorage.setItem("loginData", JSON.stringify({username: username.value}));
+				window.location.replace("http://localhost:3000/index.html");
+
+			}else{
+				alert("Username atau password tidak valid")
+			}
+			username.style.border = color;
+			password.style.border = color;
+			username.style.borderWidth = "1px";
+			password.style.borderWidth = "1px";
+			username.removeAttribute("disabled")
+			password.removeAttribute("disabled")
+			btn.removeAttribute("disabled");
+
+		}).catch(error => {
+			console.error('Error:', error);
+		});
+
+	})
+</script>
+
+</html>

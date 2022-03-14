@@ -1,0 +1,110 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h5>Dashboard Admin</h5>
+            <hr>
+            <h6>Kelola Akun Admin</h6>
+            <hr>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 0px;">
+        <div class="col-12 col-md-12">
+            <div class="card text-center" style="margin-bottom: 10px">
+                <div class="card-body">
+                    <h5 class="card-title">Tambah Akun Admin</h5>
+                    <p class="card-text">Menambah akun Admin baru untuk mengatur dan memonitor kerja sistem ini.</p>
+                    <a href="#" class="btn btn-success" id="tambahAdm"><i class="fas fa-plus"></i>&nbsp;Tambah</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 30px;">
+        <div class="col-12 col-md-12">
+            <div class="table-responsive-sm">
+                <table id="adminTable" class="table table-striped bg-light table-bordered" cellspacing="0" width="100%">
+                    <thead class="bg-custom text-white">
+                        <th style="color: black;">#</th>
+                        <th style="color: black;">Nama</th>
+                        <th style="color: black;">username</th>
+                        <th style="color: black;">level</th>
+                        <th style="color: black;"></th>
+                    </thead>
+                    <tbody>
+                        <!-- <td><button class="btn btn-danger" id="hapusAdm" value="<?php echo $ADvalue->id ?>">Hapus</button></td> -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            fetchData();
+        });
+
+        $('#tambahAdm').click(function (ev) {
+            ev.preventDefault()
+            $('#contentdata').load('tambah.html')
+        })
+
+        var fetchData = () => {
+            $('#adminTable tbody').empty();
+            fetch('http://localhost:3000/daftar_users').then(res => res.json()).then(response => {
+
+                var nomor = 1;
+
+                console.log(response)
+
+                response.forEach(element => {
+                    var nmr = "<td>" + nomor + "</td>";
+                    nomor++;
+                    var nama = "<td>" + element.nama + "</td>";
+                    var lvl = '';
+                    if (element.level == 1) {
+                        lvl = "Admin";
+                    } else {
+                        lvl = "Direktur"
+                    }
+                    var username = "<td>" + element.username + "</td>";
+                    var level = "<td>" + lvl + "</td>";
+                    var btn = "<td><button class='btn btn-danger' onclick='hapus(" + element.id_user + ")' >Hapus</button></td>"
+                    $('#adminTable tbody').append("<tr>" + nmr + nama + username + level + btn + "</tr>")
+                });
+
+                $('#adminTable').DataTable();
+                $('.dataTables_length').addClass('bs-modal');
+
+            })
+        }
+
+        var hapus = (id) => {
+            var details = {
+                "id_user": id
+            }
+
+            var formData = [];
+            for (var property in details) {
+                var encodedKey = encodeURIComponent(property);
+                var encodedValue = encodeURIComponent(details[property]);
+                formData.push(encodedKey + "=" + encodedValue);
+            }
+            formData = formData.join("&");
+
+            fetch("http://localhost:3000/del_users", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+                body: formData
+            }).then(resp => resp.json()).then(result => {
+                console.log("result", result)
+                
+                fetchData();
+
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+
+    </script>

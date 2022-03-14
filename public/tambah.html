@@ -1,0 +1,104 @@
+<div class="page">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-12">
+                <h5>Tambah Admin baru</h5>
+                <hr>
+            </div>
+        </div>
+        <form id="form">
+            <div class="row">
+                <div class="col-12 col-md-12">
+                    <div class="row">
+                        <div class="col-12 col-md-12">
+                            <div class="form-group">
+                                <label class="form-control-label" for="namaP">Nama Admin</label>
+                                <input type="text" class="form-control" id="nama" name="nama">
+                                <div class="invalid-feedback">Tolong isi nama Karyawan</div>
+                            </div>
+                            <!-- <div class="form-group">
+							<label class="form-control-label" for="deskripsiSeleksi">Deskripsi Karyawan</label>
+							<textarea name="deskripsi" class="form-control" id="deskripsiSeleksi"></textarea>
+								<div class="invalid-feedback">Tolong isi deskripsi</div>
+						</div> -->
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="nohp">Username</label>
+                                <input type="text" class="form-control" id="username" name="username">
+                                <div class="invalid-feedback">Tolong isi Username</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="emailP">Password</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                                <div class="invalid-feedback">Tolong isi Password</div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label for="exampleFormControlSelect1">Pilih level akun</label>
+                                <select class="form-control" id="level">
+                                    <option value="1">Admin</option>
+                                    <option value="2">Direktur</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-12" style="margin-top: 20px;padding-left: 0px;margin-left: 0px">
+                        <button class="btn btn-outline-primary" id="tambah">Tambah</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $('#tambah').click(function (ev) {
+        ev.preventDefault();
+        var username = document.querySelector("#username");
+        var password = document.querySelector("#password");
+        var nama = document.querySelector("#nama");
+        var level = document.querySelector("#level");
+
+        var details = {
+            "username": username.value,
+            "password": password.value,
+            "nama": nama.value,
+            "level": level.value
+        }
+
+        var formData = [];
+        for (var property in details) {
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(details[property]);
+            formData.push(encodedKey + "=" + encodedValue);
+        }
+        formData = formData.join("&");
+
+        fetch("http://localhost:3000/add_admin", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+            body: formData
+        }).then(resp => resp.json()).then(result => {
+            console.log("result", result)
+            if (result.code == 200) {
+                alert("Akun telah ditambah")
+                window.location.replace("http://localhost:3000/index.html");
+
+            } else {
+                alert("Username telah digunakan")
+            }
+
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    })
+
+</script>
