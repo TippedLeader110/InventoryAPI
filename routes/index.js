@@ -329,16 +329,63 @@ router.post('/edit_stock', (req, res) => {
       })
 })
 
-router.get('/inv_stock', (req, res, next) => {
-   database
+async function getStock() {
+   var barang = []
+   await database
       .table('stock')
       .getAll()
-      .then(barang => {
-         console.log(barang)
-         res.json(
-            barang
-         )
+      .then(async brg => {
+         // console.log(barang)
+         barang = brg
       })
+
+   var newbarang = [];
+   var newfloat = [];
+   for(var i = 0; i < barang.length; i++){
+      var element = barang[i];
+   // barang.forEach(async element => {
+      var jumlah1 = 0;
+      await database.table('transaksi').filter({ tipe_transaksi: 1, kode_barang: element.kode_barang }).getAll().then(data => {
+         data.forEach(element => {
+            jumlah1 = jumlah1 + element.jumlah;
+         });
+      })
+      var jumlah2 = 0;
+      await database.table('transaksi').filter({ tipe_transaksi: 2, kode_barang: element.kode_barang }).getAll().then(data => {
+         data.forEach(element => {
+            console.log('element');
+            console.log(element);
+            jumlah2 = jumlah2 + element.jumlah;
+         });
+      })
+      var stock = element.stock;
+      stock += jumlah1;
+      stock -= jumlah2;
+      console.log(element.kode_barang)
+      console.log(stock)
+
+
+      var data = {
+         "kode_barang": element.kode_barang,
+         "nama_barang": element.nama_barang,
+         "stock": stock,
+         "satuan": element.satuan,
+         "nilai_satuan": element.nilai_satuan,
+         "harga": element.harga
+      }
+      console.log(data)
+      newbarang.push(data)
+   // });
+   }
+   console.log("newbarang")
+   console.log(newbarang)
+   return newbarang;
+}
+
+router.get('/inv_stock', async (req, res, next) => {
+   res.json(
+      await getStock()
+   )
 })
 
 
