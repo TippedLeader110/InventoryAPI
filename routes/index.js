@@ -382,11 +382,18 @@ async function getStock() {
    return newbarang;
 }
 
-router.get('/inv_stock', async (req, res, next) => {
-   res.json(
-      await getStock()
-   )
+router.get('/inv_stock', (req, res, next) => {
+   database
+      .table('stock')
+      .getAll()
+      .then(barang => {
+         console.log(barang)
+         res.json(
+            barang
+         )
+      })
 })
+
 
 
 router.post('/inv_stock_id', (req, res) => {
